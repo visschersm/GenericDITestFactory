@@ -1,5 +1,4 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -10,38 +9,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TestUtilities.Factories;
-using TestUtilities.Interfaces;
 using TodoApi.Controllers;
 using ViewModel;
 
 namespace Tests
 {
     [TestClass]
-    public class TodoControllerTests : IBaseTest
+    public class TestLocalDependencyInjection
     {
-        private readonly Mock<ITodoService> _globalTodo = new Mock<ITodoService>();
-
-        public void RegisterDependencies(IServiceCollection services)
-        {
-            services.AddScoped(factory => _globalTodo.Object);
-        }
-
         [TestMethod]
-        public async Task GetAsync_ValidRequest_OkObjectResultAsync()
+        public async Task Test()
         {
             var factory = new ControllerFactory();
             var mock = new Mock<ITodoService>();
 
-            // local dependency
             mock.Setup(x => x.GetAsync<TodoItemListView>())
                 .ReturnsAsync(Array.Empty<TodoItemListView>());
 
-            // local dependency injection
             factory.Services.AddScoped(factory => mock.Object);
-
-            // global dependency => injection is done in RegisterDependencies
-            _globalTodo.Setup(x => x.GetAsync<TodoItemListView>())
-                .ReturnsAsync(Array.Empty<TodoItemListView>());
 
             var controller = factory.Create<TodoController>(this);
 

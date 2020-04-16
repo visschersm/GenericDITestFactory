@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TestUtilities.Interfaces;
 
 namespace TestUtilities.Factories
@@ -16,12 +11,16 @@ namespace TestUtilities.Factories
             Services = new ServiceCollection();
         }
 
-        public ServiceCollection Services { get; private set; }
+        public IServiceCollection Services { get; private set; }
 
         public TController Create<TController>(object caller)
             where TController : ControllerBase
         {
+            // TestClass dependency registration
             ((IBaseTest)caller).RegisterDependencies(Services);
+
+            // Project wide registration
+            Services.RegisterDependencies();
 
             Services.AddScoped<TController>();
 
